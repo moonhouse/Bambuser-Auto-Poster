@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Bambuser Auto-Poster
-Plugin URI: http://www.tv4.se/
+Plugin URI: http://github.com/moonhouse/Bambuser-Auto-Poster
 Description: Publish Bambuser videocasts on a blog
 Author: David Hall
 Version: 0.1
@@ -10,7 +10,7 @@ License: GPL2
 */
 
 
-add_filter('cron_schedules', 'tv4se_bambuser_cron',10); // Priority 11 to avoid being overwritten by SharedItems2WP
+add_filter('cron_schedules', 'tv4se_bambuser_cron',10);
 
 function tv4se_bambuser_cron($schedules)
 {
