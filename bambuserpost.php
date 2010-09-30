@@ -28,10 +28,7 @@ function tv4se_bambuser_cron($schedules)
 function install_tv4se_bambuser(){
     if (!wp_next_scheduled('tv4se_bambuser_event')) {
         wp_schedule_event(time()+30, 'tv4se_bambuser_update', 'tv4se_bambuser_event');
-        print "DEBUG Added event";
         print wp_next_scheduled( 'tv4se_bambuser_event');
-    } else {
-        print "DEBUG Already found event";
     }
 }
 register_activation_hook(__FILE__, 'install_tv4se_bambuser');
@@ -70,8 +67,6 @@ function tv4se_bambuser_options_page(){
     $last_save = intval(get_option('tv4se_bambuser_lastpub'));
     print "<p>Next update at ".date("Y-m-d H:i:s",$timestamp).'</p>';
     print '<p>Last clip from '.date("Y-m-d H:i:s",$last_save).'</p>';
-    // tv4se_bambuser();
-    //print_r(wp_get_schedules());
     echo '<form action="options.php" method="post">';
     settings_fields('tv4se_bambuser_options');
     do_settings_sections('bambuser');
@@ -170,7 +165,6 @@ function tv4se_bambuser(){
                     'post_category' => array($options['category'])
                 );
                 update_option('tv4se_bambuser_lastpub', $item->get_date('U'));
-                //print_r($my_post);
                 $post_id = wp_insert_post( $my_post );
 
             }
