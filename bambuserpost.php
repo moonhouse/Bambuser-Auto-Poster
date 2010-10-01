@@ -116,24 +116,24 @@ if (!class_exists('BambuserAutoposter')) {
 
 
         function admin_init(){
-            register_setting( 'tv4se_bambuser_options', 'tv4se_bambuser_options', 'tv4se_bambuser_options_validate' );
-            add_settings_section('tv4se_bambuser_autoposter', '', 'tv4se_bambuser_details_text', 'bambuser');
-            add_settings_field('tv4se_bambuser_field_1', 'User name', 'tv4se_bambuser_field_display', 'bambuser',
+            register_setting( 'tv4se_bambuser_options', 'tv4se_bambuser_options', array ( &$this, 'options_validate' ));
+            add_settings_section('tv4se_bambuser_autoposter', '',  array ( &$this, 'details_text' ), 'bambuser');
+            add_settings_field('tv4se_bambuser_field_1', 'User name', array ( &$this, 'field_display'), 'bambuser',
                 'tv4se_bambuser_autoposter','username');
-            add_settings_field('tv4se_bambuser_field_2', 'Post as user', 'tv4se_bambuser_field_display', 'bambuser',
+            add_settings_field('tv4se_bambuser_field_2', 'Post as user', array ( &$this, 'field_display'), 'bambuser',
                 'tv4se_bambuser_autoposter','postuser');
-            add_settings_field('tv4se_bambuser_field_3', 'Post in category', 'tv4se_bambuser_field_display', 'bambuser',
+            add_settings_field('tv4se_bambuser_field_3', 'Post in category', array ( &$this, 'field_display'), 'bambuser',
                 'tv4se_bambuser_autoposter','category');
-            add_settings_field('tv4se_bambuser_field_4', 'Maximum posts to publish', 'tv4se_bambuser_field_display',
+            add_settings_field('tv4se_bambuser_field_4', 'Maximum posts to publish', array ( &$this, 'field_display'),
                 'bambuser', 'tv4se_bambuser_autoposter','maxposts');
-            add_settings_field('tv4se_bambuser_field_5', 'Update interval', 'tv4se_bambuser_field_display', 'bambuser',
+            add_settings_field('tv4se_bambuser_field_5', 'Update interval', array ( &$this, 'field_display'), 'bambuser',
                 'tv4se_bambuser_autoposter','interval');
 
         }
 
 
 
-        function tv4se_bambuser_field_display($field){
+        function field_display($field){
             switch ($field) {
                 case "username":
                     echo "<input id='tv4se_bambuser_field' name='tv4se_bambuser_options[username]' size='20' type='text'";
@@ -179,11 +179,11 @@ if (!class_exists('BambuserAutoposter')) {
 
         }
 
-        function tv4se_bambuser_details_text(){
+        function details_text(){
             echo "<p>Bambuser id information and post settings</p>";
         }
 
-        function tv4se_bambuser_options_validate($input){
+        function options_validate($input){
             preg_match("/[A-Za-z0-9\-_\.\ ]*/", $input['username'], $matches);
             $newinput['username'] = $matches[0];
             $newinput['postuser'] = intval($input['postuser']);
@@ -227,5 +227,3 @@ if (!class_exists('BambuserAutoposter')) {
 
 }
 ?>
-    
- 
