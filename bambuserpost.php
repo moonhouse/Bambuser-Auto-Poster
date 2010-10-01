@@ -4,7 +4,7 @@ Plugin Name: Bambuser Auto-Poster
 Plugin URI: http://github.com/moonhouse/Bambuser-Auto-Poster
 Description: Publish Bambuser videocasts on a blog
 Author: David Hall
-Version: 0.14
+Version: 0.15
 Author URI: http://www.tv4.se/
 License: GPL2
 */
@@ -112,6 +112,7 @@ if (!class_exists('BambuserAutoposter')) {
             do_settings_sections('bambuser');
             echo '<input name="Submit" type="submit" value="'. esc_attr('Save Changes') .'" />
 </form></div>';
+$this->fetch_and_insert();
         }
 
 
@@ -209,19 +210,22 @@ if (!class_exists('BambuserAutoposter')) {
             if($feed && $feed->get_items()) {
                 $maxitems = $this->o['maxposts'];
                 $items = array_slice($feed->get_items(), 0, $maxitems);
+                $counter = 0;
                 foreach ( $items as $item ) :
+      				$counter++;
                     if(intval($item->get_date('U')) > $last_save) {
                         $my_post = array(
                             'post_title' => $item->get_title(),
                             'post_content' => $this->get_embed_code($item->get_enclosure()->get_link()),
-                            'post_date' => date('Y-m-d H:i:s',$item->get_date('Y-m-d H:i:s'+get_option( 'gmt_offset' ) * 3600)),
+                            'post_date' => date('Y-m-d H:i:s',intval($item->get_date('U'))+get_option( 'gmt_offset' ) * 3600),
                             'post_status' => 'publish',
                             'post_author' => $this->o['postuser'],
                             'post_category' => array($this->o['category'])
                         );
-                        update_option('tv4se_bambuser_lastpub', $item->get_date('U'));
                         $post_id = wp_insert_post( $my_post );
-
+                        if($counter==1) {
+                        	update_option('tv4se_bambuser_lastpub', $item->get_date('U'));
+                        }
                     }
 
                 endforeach;
