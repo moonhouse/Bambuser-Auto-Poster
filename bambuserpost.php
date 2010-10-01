@@ -4,7 +4,7 @@ Plugin Name: Bambuser Auto-Poster
 Plugin URI: http://github.com/moonhouse/Bambuser-Auto-Poster
 Description: Publish Bambuser videocasts on a blog
 Author: David Hall
-Version: 0.15
+Version: 0.16
 Author URI: http://www.tv4.se/
 License: GPL2
 */
@@ -29,6 +29,7 @@ if (!class_exists('BambuserAutoposter')) {
             $this->read_options();
 	        $this->actions_filters();
         }
+
 
         function read_options() {
             $this->o = get_option($this->opt_key);
@@ -193,13 +194,10 @@ if (!class_exists('BambuserAutoposter')) {
             return $newinput;
         }
 
-        function get_embed_code($link) {
-        	return '<div><object id="bplayer" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="176"'
-        	+ 'height="180"><embed name="bplayer" src="'.$link.'" type="application/x-shockwave-flash" width="176"'
-        	+ 'height="180" allowfullscreen="true" allowscriptaccess="always" wmode="opaque"></embed><param name="movie"'
-        	+ 'value="'.$link.'"></param><param name="allowfullscreen" value="true"></param><param '
-        	+ 'name="allowscriptaccess" value="always"></param><param name="wmode" value="opaque"></param></object>'
-        	+ '</div>';
+        function get_shortcode($link) {
+        	preg_match("/vid=([0-9]*)/", $link, $matches);
+        	$id = $matches[1];
+        	return '[bambuser id="'.$id.'"]';
         }
 
         function fetch_and_insert(){
@@ -215,7 +213,7 @@ if (!class_exists('BambuserAutoposter')) {
                     if(intval($item->get_date('U')) > $last_save) {
                         $my_post = array(
                             'post_title' => $item->get_title(),
-                            'post_content' => $this->get_embed_code($item->get_enclosure()->get_link()),
+                            'post_content' => $this->get_shortcode($item->get_enclosure()->get_link()),
                             'post_date' => date('Y-m-d H:i:s',intval($item->get_date('U'))+get_option( 'gmt_offset' ) * 3600),
                             'post_status' => 'publish',
                             'post_author' => $this->o['postuser'],
