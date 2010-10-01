@@ -112,7 +112,6 @@ if (!class_exists('BambuserAutoposter')) {
             do_settings_sections('bambuser');
             echo '<input name="Submit" type="submit" value="'. esc_attr('Save Changes') .'" />
 </form></div>';
-$this->fetch_and_insert();
         }
 
 
