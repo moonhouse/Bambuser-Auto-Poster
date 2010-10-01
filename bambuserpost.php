@@ -4,7 +4,7 @@ Plugin Name: Bambuser Auto-Poster
 Plugin URI: http://github.com/moonhouse/Bambuser-Auto-Poster
 Description: Publish Bambuser videocasts on a blog
 Author: David Hall
-Version: 0.13
+Version: 0.14
 Author URI: http://www.tv4.se/
 License: GPL2
 */
@@ -38,9 +38,9 @@ if (!class_exists('BambuserAutoposter')) {
             add_filter('cron_schedules', array ( &$this, 'cron' ));
             add_action('tv4se_bambuser_event', array ( &$this, 'fetch_and_insert' ));
             register_activation_hook(__FILE__, array ( &$this, 'install_plugin' ));
-            register_deactivation_hook(__FILE__, 'uninstall_plugin');
+            register_deactivation_hook(__FILE__,array ( &$this,  'uninstall_plugin'));
             add_action('admin_init', array ( &$this, 'admin_init' ));
-            add_filter( 'wp_feed_cache_transient_lifetime', array ( &$this, 'cachetime' ), 10, 2 );
+            add_filter( 'wp_feed_cache_transient_lifetime', array(&$this, 'cachetime' ), 10, 2 );
             add_action('admin_menu', array ( &$this, 'settings_menu' ));
         }
 
@@ -192,6 +192,15 @@ if (!class_exists('BambuserAutoposter')) {
             $newinput['interval'] = abs(intval($input['interval']));
             return $newinput;
         }
+        
+        function get_embed_code($link) {
+        	return '<div><object id="bplayer" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="176"'
+        	+ 'height="180"><embed name="bplayer" src="'.$link.'" type="application/x-shockwave-flash" width="176"'
+        	+ 'height="180" allowfullscreen="true" allowscriptaccess="always" wmode="opaque"></embed><param name="movie"'
+        	+ 'value="'.$link.'"></param><param name="allowfullscreen" value="true"></param><param '
+        	+ 'name="allowscriptaccess" value="always"></param><param name="wmode" value="opaque"></param></object>'
+        	+ '</div>';
+        }
 
         function fetch_and_insert(){
             $last_save = intval(get_option('tv4se_bambuser_lastpub'));
@@ -204,8 +213,8 @@ if (!class_exists('BambuserAutoposter')) {
                     if(intval($item->get_date('U')) > $last_save) {
                         $my_post = array(
                             'post_title' => $item->get_title(),
-                            'post_content' => $item->get_enclosure()->native_embed(),
-                            'post_date' => $item->get_date('Y-m-d H:i:s'),
+                            'post_content' => get_embed_code($item->get_enclosure()->get_link()),
+                            'post_date' => $item->get_date('Y-m-d H:i:s') + (get_option( 'gmt_offset' ) * 3600),
                             'post_status' => 'publish',
                             'post_author' => $this->o['postuser'],
                             'post_category' => array($this->o['category'])
