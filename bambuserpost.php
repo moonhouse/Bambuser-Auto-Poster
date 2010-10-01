@@ -105,8 +105,8 @@ if (!class_exists('BambuserAutoposter')) {
             echo "<h2>Bambuser Autoposter Settings</h2>";
             $timestamp = wp_next_scheduled( 'tv4se_bambuser_event');
             $last_save = intval(get_option('tv4se_bambuser_lastpub'));
-            print "<p>Next update at ".date("Y-m-d H:i:s",$timestamp).'</p>';
-            print '<p>Last clip from '.date("Y-m-d H:i:s",$last_save).'</p>';
+            print "<p>Next update at ".date("Y-m-d H:i:s",$timestamp+get_option( 'gmt_offset' ) * 3600).'</p>';
+            print '<p>Last clip from '.date("Y-m-d H:i:s",$last_save+get_option( 'gmt_offset' ) * 3600).'</p>';
             echo '<form action="options.php" method="post">';
             settings_fields('tv4se_bambuser_options');
             do_settings_sections('bambuser');
@@ -192,7 +192,7 @@ if (!class_exists('BambuserAutoposter')) {
             $newinput['interval'] = abs(intval($input['interval']));
             return $newinput;
         }
-        
+
         function get_embed_code($link) {
         	return '<div><object id="bplayer" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="176"'
         	+ 'height="180"><embed name="bplayer" src="'.$link.'" type="application/x-shockwave-flash" width="176"'
@@ -213,13 +213,12 @@ if (!class_exists('BambuserAutoposter')) {
                     if(intval($item->get_date('U')) > $last_save) {
                         $my_post = array(
                             'post_title' => $item->get_title(),
-                            'post_content' => get_embed_code($item->get_enclosure()->get_link()),
-                            'post_date' => $item->get_date('Y-m-d H:i:s') + (get_option( 'gmt_offset' ) * 3600),
+                            'post_content' => $this->get_embed_code($item->get_enclosure()->get_link()),
+                            'post_date' => date('Y-m-d H:i:s',$item->get_date('Y-m-d H:i:s'+get_option( 'gmt_offset' ) * 3600)),
                             'post_status' => 'publish',
                             'post_author' => $this->o['postuser'],
                             'post_category' => array($this->o['category'])
                         );
-                        // todo: Fix so that flash embed always is published.
                         update_option('tv4se_bambuser_lastpub', $item->get_date('U'));
                         $post_id = wp_insert_post( $my_post );
 
