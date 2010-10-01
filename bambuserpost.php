@@ -4,7 +4,7 @@ Plugin Name: Bambuser Auto-Poster
 Plugin URI: http://github.com/moonhouse/Bambuser-Auto-Poster
 Description: Publish Bambuser videocasts on a blog
 Author: David Hall
-Version: 0.11
+Version: 0.13
 Author URI: http://www.tv4.se/
 License: GPL2
 */
