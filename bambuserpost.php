@@ -3,8 +3,8 @@
 Plugin Name: Bambuser Auto-Poster
 Plugin URI: http://github.com/moonhouse/Bambuser-Auto-Poster
 Description: Publish Bambuser videocasts on a blog
-Author: David Hall
-Version: 0.16
+Author: David Hall, parts of code from Mattias Norell
+Version: 0.17
 Author URI: http://www.tv4.se/
 License: GPL2
 */
@@ -43,6 +43,8 @@ if (!class_exists('BambuserAutoposter')) {
             add_action('admin_init', array ( &$this, 'admin_init' ));
             add_filter( 'wp_feed_cache_transient_lifetime', array(&$this, 'cachetime' ), 10, 2 );
             add_action('admin_menu', array ( &$this, 'settings_menu' ));
+            add_shortcode('bambuser', array(&$this, 'shortcode'));
+
         }
 
         function cron($schedules)
@@ -228,6 +230,36 @@ if (!class_exists('BambuserAutoposter')) {
                 endforeach;
             }
         }
+
+ function shortcode($atts, $content=null) {
+		extract(shortcode_atts(array(
+			'id' 	=> '',
+			'channel' => '',
+			'playlist' => 'hide',
+			'width' 	=> '424',
+			'height' 	=> '321',
+		), $atts));
+
+		if($channel !== '' && $height == 321){$height = 500;}
+		if($playlist=='show' && $height == 321){$height = 500;}
+
+		if (!is_numeric($id)){
+			return '<object id="bplayer" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="'.$width.'"'
+                    . 'height="'.$height.'"><embed name="bplayer"'
+                    . 'src="http://bambuser.com/r/player.swf?username='.$channel.'" type="application/x-shockwave-flash"'
+                    . 'width="'.$width.'" height="'.$height.'" allowfullscreen="true" wmode="opaque"></embed><param '
+                    . 'name="movie" value="http://bambuser.com/r/player.swf?username='.$channel.'"></param><param '
+                    . 'name="allowfullscreen" value="true"></param><param name="wmode" value="opaque"></param></object>';
+		} else {
+            return '<object id="bplayer" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="'.$width.'"'
+                    . 'height="'.$height.'"><embed name="bplayer" src="http://static.bambuser.com/r/player.swf?vid='
+                    . $id.'" type="application/x-shockwave-flash" width="'.$width.'" height="'.$height.'"'
+                    . 'allowfullscreen="true" wmode="opaque"></embed><param name="movie" '
+                    . 'value="http://static.bambuser.com/r/player.swf?vid='.$id.'"></param><param name="allowfullscreen"'
+                    . 'value="true"></param><param name="wmode" value="opaque"></param></object>';
+		}
+    }
+
 
 
     }
